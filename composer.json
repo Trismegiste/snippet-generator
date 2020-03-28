@@ -1,6 +1,6 @@
 {
-    "name": "trismegiste/design-pattern-snippet",
-    "description": "Generators for snippet of design patterns",
+    "name": "trismegiste/snippet-generator",
+    "description": "Generators of snippet for common patterns",
     "type": "project",
     "require": {
         "symfony/console": "^5.0",
@@ -20,7 +20,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Trismegiste\\DesignPattern\\SnippetGenerator\\": "./src"
+            "Trismegiste\\SnippetGenerator\\": "./src"
         }
     }
 }

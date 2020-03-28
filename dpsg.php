@@ -1,7 +1,7 @@
 <?php
 
 use Symfony\Component\Console\Application;
-use Trismegiste\DesignPattern\SnippetGenerator\Command\Decorator;
+use Trismegiste\SnippetGenerator\Command\Decorator;
 
 /*
  * trismegiste/design-pattern-snippet

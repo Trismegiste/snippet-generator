@@ -1,10 +1,10 @@
 <?php
 
 /*
- * trismegiste/design-pattern-snippet
+ * trismegiste/snippet-generator
  */
 
-namespace Trismegiste\DesignPattern\SnippetGenerator\Command;
+namespace Trismegiste\SnippetGenerator\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -36,7 +36,7 @@ class Decorator extends Command {
                 ->name($interfaceName . '.php')
                 ->files();
 
-        $found = iterator_to_array($iter);
+        $found = array_values(iterator_to_array($iter));
         switch (count($found)) {
             case 0:
                 throw new RuntimeException("$interfaceName was not found");
@@ -44,7 +44,7 @@ class Decorator extends Command {
                 $interfaceFile = array_pop($found);
                 break;
             default :
-                $interfaceFile = $io->choice("There are multiple files that name $interfaceName, which one do you refer", $found);
+                $interfaceFile = $io->choice("There are multiple files with the name '$interfaceName', which one do you refer", $found);
         }
 
         $io->section("Generation of a Decorator for $interfaceName located in $interfaceFile");
