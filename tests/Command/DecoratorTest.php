@@ -1,8 +1,8 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Trismegiste\SnippetGenerator\Application;
 use Trismegiste\SnippetGenerator\Command\Decorator;
 
 class DecoratorTest extends TestCase {

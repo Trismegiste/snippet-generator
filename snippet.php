@@ -1,6 +1,6 @@
 <?php
 
-use Symfony\Component\Console\Application;
+use Trismegiste\SnippetGenerator\Application;
 use Trismegiste\SnippetGenerator\Command\Decorator;
 
 /*
@@ -9,7 +9,8 @@ use Trismegiste\SnippetGenerator\Command\Decorator;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-$app = new Application('Design Pattern Snippet Generator');
+$app = new Application('Snippet Generator');
+// adding commands :
 $app->add(new Decorator);
 
 $app->run();

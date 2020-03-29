@@ -16,8 +16,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 use Trismegiste\SnippetGenerator\Visitor\DecoratorGenerator;
 
 /**
@@ -37,23 +35,7 @@ class Decorator extends Command {
         $io->title('Decorator generator');
         $interfaceName = $input->getArgument('interface');
 
-        $iter = new Finder();
-        $iter->in($input->getArgument('source'))
-                ->name($interfaceName . '.php')
-                ->files();
-
-        $found = iterator_to_array($iter);
-        switch (count($found)) {
-            case 0:
-                throw new RuntimeException("$interfaceName was not found");
-            case 1:
-                /* @var $interfaceFile SplFileInfo */
-                $interfaceFile = array_pop($found);
-                break;
-            default :
-                $choice = $io->choice("There are multiple files with the name '$interfaceName', please select the one you refer to ", array_keys($found));
-                $interfaceFile = $found[$choice];
-        }
+        $interfaceFile = $this->getHelper('file-picker')->pickFile($input, $output, $input->getArgument('source'), $interfaceName . '.php');
 
         $io->section("Generation of a Decorator for $interfaceName located in $interfaceFile");
 
