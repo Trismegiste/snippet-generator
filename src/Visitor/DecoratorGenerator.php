@@ -51,21 +51,7 @@ class DecoratorGenerator extends NameResolver {
 
         // implementing decoration in methods :
         if ($node instanceof Node\Stmt\ClassMethod) {
-
-            $args = [];
-            foreach ($node->params as $param) {
-                $args[] = new Node\Expr\Variable($param->var->name);
-            }
-
-            $methodCall = new Node\Expr\MethodCall(
-                    new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), 'decorated'),
-                    $node->name, $args);
-
-            if ($node->returnType == 'void') {
-                $node->stmts[0] = new Node\Stmt\Expression($methodCall);
-            } else {
-                $node->stmts[0] = new Node\Stmt\Return_($methodCall);
-            }
+            $this->implementsMethod($node);
             $node->setAttribute('comments', null);
         }
     }
@@ -76,20 +62,9 @@ class DecoratorGenerator extends NameResolver {
         // finalizing the decorator :
         if ($node instanceof Node\Stmt\Class_) {
             // Add constructor
-            $constructor = new Node\Stmt\ClassMethod('__construct', [
-                'params' => [
-                    new Node\Param(new Node\Expr\Variable('decorated'), null, $node->implements[0]->name)
-                ],
-                'flags' => Node\Stmt\Class_::MODIFIER_PUBLIC
-            ]);
-            $constructor->stmts[0] = new Node\Stmt\Expression(new Node\Expr\Assign(
-                            new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), 'decorated'),
-                            new Node\Expr\Variable('decorated')
-            ));
-            array_unshift($node->stmts, $constructor);
-            array_unshift($node->stmts, new Node\Stmt\Property(Node\Stmt\Class_::MODIFIER_PROTECTED, [new Node\Stmt\PropertyProperty('decorated')]));
-
-
+            array_unshift($node->stmts, $this->createConstructor($node));
+            // add property for embed object
+            array_unshift($node->stmts, $this->createDecoratedProperty());
             // Remove ClassConst
             $node->stmts = array_filter($node->stmts, function($node) {
                 return !($node instanceof Node\Stmt\ClassConst);
@@ -99,8 +74,38 @@ class DecoratorGenerator extends NameResolver {
         }
     }
 
-    private function createDecoratedProperty() {
-        return;
+    private function createDecoratedProperty(): Node\Stmt\Property {
+        return new Node\Stmt\Property(Node\Stmt\Class_::MODIFIER_PROTECTED, [new Node\Stmt\PropertyProperty('decorated')]);
+    }
+
+    private function createConstructor(Node $node): Node\Stmt\ClassMethod {
+        $constructor = new Node\Stmt\ClassMethod('__construct', [
+            'params' => [new Node\Param(new Node\Expr\Variable('decorated'), null, $node->implements[0]->name)],
+            'flags' => Node\Stmt\Class_::MODIFIER_PUBLIC,
+            'stmts' => [new Node\Stmt\Expression(new Node\Expr\Assign(
+                                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), 'decorated'),
+                                new Node\Expr\Variable('decorated')
+                        ))]
+        ]);
+
+        return $constructor;
+    }
+
+    private function implementsMethod(Node $node): void {
+        $args = [];
+        foreach ($node->params as $param) {
+            $args[] = new Node\Expr\Variable($param->var->name);
+        }
+
+        $methodCall = new Node\Expr\MethodCall(
+                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), 'decorated'),
+                $node->name, $args);
+
+        if ($node->returnType == 'void') {
+            $node->stmts[0] = new Node\Stmt\Expression($methodCall);
+        } else {
+            $node->stmts[0] = new Node\Stmt\Return_($methodCall);
+        }
     }
 
 }
