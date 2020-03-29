@@ -34,7 +34,7 @@ class DecoratorGenerator extends NameResolver {
             });
 
             if (0 === count($node->stmts)) {
-                throw new \LogicException("Could not find any interface named {$this->interfaceName}");
+                throw new \LogicException("{$this->interfaceName} interface not found");
             }
 
             return $node;
