@@ -29,9 +29,10 @@ class ClassToInterfaceGeneratorTest extends VisitorTestCase {
     public function testRealCase() {
         $content = file_get_contents(__DIR__ . '/../fixtures/User.php');
         $ast = $this->generate('User', substr($content, 5));
+        $this->assertStringContainsString('42', $this->toPhp($ast));
         $this->assertCount(1, $ast[0]->stmts);
         $inter = array_pop($ast[0]->stmts);
-        $this->assertCount(3, $inter->stmts);
+        $this->assertCount(3, $inter->stmts);  // 1 const + 2 methods
     }
 
     public function testNotFound() {

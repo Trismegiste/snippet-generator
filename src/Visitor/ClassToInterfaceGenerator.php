@@ -13,24 +13,22 @@ use PhpParser\Node\Stmt\ClassConst;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\Node\Stmt\Interface_;
 use PhpParser\Node\Stmt\Namespace_;
-use PhpParser\NodeVisitor\NameResolver;
+use PhpParser\NodeVisitorAbstract;
 
 /**
  * Generate a new Interface wth the methods of a concrete class
  */
-class ClassToInterfaceGenerator extends NameResolver {
+class ClassToInterfaceGenerator extends NodeVisitorAbstract {
 
     protected $className;
     protected $interfaceName;
 
     public function __construct(string $className, string $interfaceName) {
-        parent::__construct();
         $this->className = $className;
         $this->interfaceName = $interfaceName;
     }
 
     public function enterNode(Node $node) {
-        parent::enterNode($node);
 
         // filtering class in this namespace :
         if ($node instanceof Namespace_) {
@@ -45,11 +43,11 @@ class ClassToInterfaceGenerator extends NameResolver {
             return $node;
         }
 
-        // transforms the class into in an interface :
+        // transforms the class into an interface :
         if ($node instanceof Class_) {
             // Keep only methods and constants :
             $node->stmts = array_filter($node->stmts, function($node) {
-                if ($node instanceof ClassConst) {
+                if (($node instanceof ClassConst) && $node->isPublic()) {
                     return true;
                 }
 

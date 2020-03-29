@@ -2,13 +2,12 @@
 
 namespace App\Security;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use Trismegiste\Toolbox\MongoDb\RootImpl;
 
 /**
  * Some conrete class to abstract
  */
-class User implements UserInterface {
+class User {
 
     use RootImpl;
 
