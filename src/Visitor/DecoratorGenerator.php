@@ -11,7 +11,7 @@ use PhpParser\Node\Stmt\Interface_;
 use PhpParser\NodeVisitor\NameResolver;
 
 /**
- * DecoratorGenerator transforms an interface into an implementation a Decorator according to Design Pattern Decorator
+ * DecoratorGenerator transforms an interface into an implementation of a Decorator according to Design Pattern Decorator
  */
 class DecoratorGenerator extends NameResolver {
 
@@ -27,7 +27,7 @@ class DecoratorGenerator extends NameResolver {
     public function enterNode(Node $node) {
         parent::enterNode($node);
 
-        // filtering interface inn this namespace :
+        // filtering interface in this namespace :
         if ($node instanceof Node\Stmt\Namespace_) {
             $node->stmts = array_filter($node->stmts, function($node) {
                 return ($node instanceof Interface_) && ((string) $node->name === $this->interfaceName);
@@ -42,13 +42,9 @@ class DecoratorGenerator extends NameResolver {
 
         // transforms the interface into in a class :
         if ($node instanceof Interface_) {
-            $decorator = new Node\Stmt\Class_($this->decoratorName, [
-                'implements' => [$node->name],
-                'stmts' => $node->stmts
-                    ], [
-                'comments' => [new \PhpParser\Comment\Doc('/** This is a Decorator for ' . $node->namespacedName . ' */')]
-            ]);
-            array_unshift($decorator->stmts, new Node\Stmt\Property(Node\Stmt\Class_::MODIFIER_PROTECTED, [new Node\Stmt\PropertyProperty('decorated')]));
+            $decorator = new Node\Stmt\Class_($this->decoratorName,
+                    ['implements' => [$node->name], 'stmts' => $node->stmts],
+                    ['comments' => [new \PhpParser\Comment\Doc('/** This is a Decorator for ' . $node->namespacedName . ' */')]]);
 
             return $decorator;
         }
@@ -77,7 +73,7 @@ class DecoratorGenerator extends NameResolver {
     public function leaveNode(Node $node) {
         parent::leaveNode($node);
 
-        // adding the ctor :
+        // finalizing the decorator :
         if ($node instanceof Node\Stmt\Class_) {
             // Add constructor
             $constructor = new Node\Stmt\ClassMethod('__construct', [
@@ -90,7 +86,9 @@ class DecoratorGenerator extends NameResolver {
                             new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), 'decorated'),
                             new Node\Expr\Variable('decorated')
             ));
-            $node->stmts[] = $constructor;
+            array_unshift($node->stmts, $constructor);
+            array_unshift($node->stmts, new Node\Stmt\Property(Node\Stmt\Class_::MODIFIER_PROTECTED, [new Node\Stmt\PropertyProperty('decorated')]));
+
 
             // Remove ClassConst
             $node->stmts = array_filter($node->stmts, function($node) {
@@ -99,6 +97,10 @@ class DecoratorGenerator extends NameResolver {
 
             return $node;
         }
+    }
+
+    private function createDecoratedProperty() {
+        return;
     }
 
 }
