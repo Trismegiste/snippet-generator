@@ -2,35 +2,13 @@
 
 use PhpParser\Node\Stmt\Class_;
 use PhpParser\Node\Stmt\ClassMethod;
+use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\Node\Stmt\Return_;
-use PhpParser\NodeDumper;
-use PhpParser\NodeTraverser;
-use PhpParser\ParserFactory;
-use PHPUnit\Framework\TestCase;
+use Tests\Visitor\VisitorTestCase;
 use Trismegiste\SnippetGenerator\Visitor\DecoratorGenerator;
 
-class DecoratorGeneratorTest extends TestCase {
-
-    protected $parser;
-    protected $traverser;
-    protected $dumper;
-
-    protected function setUp(): void {
-        $this->parser = (new ParserFactory)->create(ParserFactory::ONLY_PHP7);
-        $this->traverser = new NodeTraverser();
-        $this->dumper = new NodeDumper;
-    }
-
-    protected function tearDown(): void {
-        unset($this->parser);
-        unset($this->traverser);
-        unset($this->dumper);
-    }
-
-    protected function dump($node) {
-        return $this->dumper->dump($node);
-    }
+class DecoratorGeneratorTest extends VisitorTestCase {
 
     protected function decorate(string $name, string $example) {
         $ast = $this->parser->parse('<?php ' . $example);
@@ -102,7 +80,7 @@ class DecoratorGeneratorTest extends TestCase {
 
         $methNode = $decorator[0]->stmts[0]->stmts[2];
         $this->assertCount(1, $methNode->stmts);
-        $this->assertInstanceOf(\PhpParser\Node\Stmt\Expression::class, $methNode->stmts[0]);
+        $this->assertInstanceOf(Expression::class, $methNode->stmts[0]);
     }
 
 }
