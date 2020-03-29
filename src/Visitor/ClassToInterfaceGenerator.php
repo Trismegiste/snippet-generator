@@ -49,8 +49,15 @@ class ClassToInterfaceGenerator extends NameResolver {
         if ($node instanceof Class_) {
             // Keep only methods and constants :
             $node->stmts = array_filter($node->stmts, function($node) {
-                return (($node instanceof ClassMethod) && ((string) $node->name !== '__construct')) ||
-                        ($node instanceof ClassConst);
+                if ($node instanceof ClassConst) {
+                    return true;
+                }
+
+                if (($node instanceof ClassMethod) && ((string) $node->name !== '__construct') && ($node->isPublic())) {
+                    return true;
+                }
+
+                return false;
             });
 
             // creating the interface Node :

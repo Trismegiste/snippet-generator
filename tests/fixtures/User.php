@@ -38,4 +38,8 @@ class User implements UserInterface {
         return (string) $this->password;
     }
 
+    protected function notExported() {
+        
+    }
+
 }
