@@ -24,7 +24,7 @@ use Trismegiste\SnippetGenerator\Visitor\DecoratorGenerator;
 class Decorator extends Command {
 
     protected function configure() {
-        $this->setName('dp:decorator')
+        $this->setName('pattern:decorator')
                 ->setDescription('Generate a Decorator for an Interface')
                 ->addArgument('interface', InputArgument::REQUIRED, "name of the Interface files (without '.php'')")
                 ->addArgument('source', InputArgument::OPTIONAL, 'The directory of your source', './src');

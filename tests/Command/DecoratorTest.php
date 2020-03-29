@@ -12,7 +12,7 @@ class DecoratorTest extends TestCase {
         $application->setAutoExit(false);
         $command = new Decorator();
         $application->add($command);
-        $tester = new CommandTester($application->find('dp:decorator'));
+        $tester = new CommandTester($application->find('pattern:decorator'));
 
         $this->assertEquals(0, $tester->execute([
                     'source' => __DIR__ . '/../fixtures',
