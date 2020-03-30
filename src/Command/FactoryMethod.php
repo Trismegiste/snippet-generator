@@ -66,7 +66,7 @@ class FactoryMethod extends Command {
         $this->write($io, $classFile->getPath(), $modelInterface, $this->generateModelInterface($source, $className, $modelInterface));
         $this->write($io, $classFile->getPath(), $modelConcrete, $this->updateModelClass($source, $className, $modelInterface, $modelConcrete));
         $this->write($io, $classFile->getPath(), $factoryInterface, $this->generateFactoryInterface($source, $className, $factoryInterface, $modelInterface));
-        $this->write($io, $classFile->getPath(), $factoryConcrete, $this->generateConcreteFactory($source, $className, $modelConcrete, $modelInterface, $factoryInterface, $factoryConcrete));
+        $this->write($io, $classFile->getPath(), $factoryConcrete, $this->generateConcreteFactory($source, $className, $modelConcrete, $modelInterface, $factoryConcrete, $factoryInterface));
 
         return 0;
     }
@@ -119,7 +119,7 @@ class FactoryMethod extends Command {
         }
     }
 
-    private function generateConcreteFactory(string $source, string $className, $modelConcrete, $modelInterface, $factoryInterface, $factoryConcrete): string {
+    private function generateConcreteFactory(string $source, string $className, $modelConcrete, $modelInterface, $factoryConcrete, $factoryInterface): string {
         try {
             $ast = $this->parser->parse($source);
             $traverser = new NodeTraverser();
