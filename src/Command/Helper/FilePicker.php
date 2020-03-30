@@ -26,8 +26,6 @@ class FilePicker extends Helper {
     }
 
     public function pickFile(InputInterface $input, OutputInterface $output, string $folder, string $pattern): SplFileInfo {
-        $questionHelper = $this->getHelperSet()->get('question');
-
         $iter = new Finder();
         $iter->in($folder)->name($pattern)->files();
 
@@ -36,10 +34,10 @@ class FilePicker extends Helper {
             case 0:
                 throw new RuntimeException("No file matching '$pattern' were found");
             case 1:
-                /* @var $interfaceFile SplFileInfo */
                 $pickedOne = array_pop($found);
                 break;
             default :
+                $questionHelper = $this->getHelperSet()->get('question');
                 $question = new ChoiceQuestion(sprintf(self::question, $pattern), array_keys($found));
                 $choice = $questionHelper->ask($input, $output, $question);
                 $pickedOne = $found[$choice];
