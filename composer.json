@@ -1,6 +1,6 @@
 {
     "name": "trismegiste/snippet-generator",
-    "description": "Generators of snippet for common patterns",
+    "description": "Snippets generators for common patterns",
     "type": "project",
     "require": {
         "symfony/console": "^5.0",
@@ -14,8 +14,7 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Trismegiste",
-            "email": "flo@trismegiste.net"
+            "name": "Trismegiste"
         }
     ],
     "autoload": {

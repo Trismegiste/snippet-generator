@@ -17,15 +17,18 @@ use Symfony\Component\Finder\SplFileInfo;
 /**
  * Description of FinderHelper
  */
-class FilePicker extends Helper {
+class FilePicker extends Helper
+{
 
     protected const question = "There are multiple files matching '%s', please select the one you refer to ";
 
-    public function getName(): string {
+    public function getName(): string
+    {
         return 'file-picker';
     }
 
-    public function pickFile(InputInterface $input, OutputInterface $output, string $folder, string $pattern): SplFileInfo {
+    public function pickFile(InputInterface $input, OutputInterface $output, string $folder, string $pattern): SplFileInfo
+    {
         $iter = new Finder();
         $iter->in($folder)->name($pattern)->files();
 
