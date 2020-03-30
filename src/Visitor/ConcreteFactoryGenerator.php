@@ -17,7 +17,8 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * Generates the implementation of FactoryMethod Interface
  */
-class ConcreteFactoryGenerator extends NodeVisitorAbstract {
+class ConcreteFactoryGenerator extends NodeVisitorAbstract
+{
 
     protected $className;
     protected $factoryName;
@@ -25,7 +26,16 @@ class ConcreteFactoryGenerator extends NodeVisitorAbstract {
     protected $factoryInterfaceName;
     protected $model;
 
-    public function __construct(string $className, string $model, string $objectInterface, string $factoryName, string $factoryInterfaceName) {
+    /**
+     * Ctor
+     * @param string $className The original concrete class name to refactor
+     * @param string $model The class name of the Model (built by the concrete factory)
+     * @param string $objectInterface The interface name of the Model
+     * @param string $factoryName The class name of the concrete factory
+     * @param string $factoryInterfaceName The interface name of the factory
+     */
+    public function __construct(string $className, string $model, string $objectInterface, string $factoryName, string $factoryInterfaceName)
+    {
         $this->className = $className;
         $this->factoryName = $factoryName;
         $this->objectInterface = $objectInterface;
@@ -33,7 +43,8 @@ class ConcreteFactoryGenerator extends NodeVisitorAbstract {
         $this->model = $model;
     }
 
-    public function enterNode(Node $node) {
+    public function enterNode(Node $node)
+    {
         // filtering class in this namespace :
         if ($node instanceof Namespace_) {
             $node->stmts = array_filter($node->stmts, function($node) {

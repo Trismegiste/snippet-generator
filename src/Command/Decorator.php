@@ -6,7 +6,6 @@
 
 namespace Trismegiste\SnippetGenerator\Command;
 
-use PhpParser\Error;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -19,18 +18,21 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Trismegiste\SnippetGenerator\Visitor\DecoratorGenerator;
 
 /**
- * Description of Decorator
+ * This command generates a Decorator for an interface
  */
-class Decorator extends Command {
+class Decorator extends Command
+{
 
-    protected function configure() {
+    protected function configure()
+    {
         $this->setName('pattern:decorator')
-                ->setDescription('Generate a Decorator for an Interface')
-                ->addArgument('interface', InputArgument::REQUIRED, "name of the Interface file (without '.php'')")
-                ->addArgument('source', InputArgument::OPTIONAL, 'The directory of your source', './src');
+            ->setDescription('Generate a Decorator for an Interface')
+            ->addArgument('interface', InputArgument::REQUIRED, "name of the Interface file (without '.php'')")
+            ->addArgument('source', InputArgument::OPTIONAL, 'The directory of your source', './src');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $io = new SymfonyStyle($input, $output);
         $io->title('Decorator generator');
         $interfaceName = $input->getArgument('interface');

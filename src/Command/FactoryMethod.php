@@ -23,9 +23,14 @@ use Trismegiste\SnippetGenerator\Visitor\ConcreteFactoryGenerator;
 use Trismegiste\SnippetGenerator\Visitor\FactoryMethodGenerator;
 
 /**
- * Description of FactoryMethod
+ * This command generate 4 files (or creates 3 and update 1) from a concrete to a
+ * Factory Method design pattern.
+ * 
+ * Since you're using git, there is NO checking on existing files and generation
+ * could overwrite your files.
  */
-class FactoryMethod extends Command {
+class FactoryMethod extends Command
+{
 
     protected const nameMsg = "Please choose a name for the ";
 
@@ -33,21 +38,24 @@ class FactoryMethod extends Command {
     protected $printer;
     protected $dryRun = false;
 
-    protected function configure() {
+    protected function configure()
+    {
         $this->setName('pattern:factory-method')
-                ->setDescription('Generate a Factory Method for a concrete Class')
-                ->addArgument('class', InputArgument::REQUIRED, "name of the Class file (without '.php'')")
-                ->addArgument('source', InputArgument::OPTIONAL, 'The directory of your source', './src')
-                ->addOption('dry', null, InputOption::VALUE_NONE, "No writing, only test")
-                ->setHelp(file_get_contents(__DIR__ . '/../../doc/FactoryMethod.md'));
+            ->setDescription('Generate a Factory Method for a concrete Class')
+            ->addArgument('class', InputArgument::REQUIRED, "name of the Class file (without '.php'')")
+            ->addArgument('source', InputArgument::OPTIONAL, 'The directory of your source', './src')
+            ->addOption('dry', null, InputOption::VALUE_NONE, "No writing, only test")
+            ->setHelp(file_get_contents(__DIR__ . '/../../doc/FactoryMethod.md'));
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output) {
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
         $this->parser = (new ParserFactory)->create(ParserFactory::ONLY_PHP7);
         $this->prettyPrinter = new Standard();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $this->dryRun = $input->getOption("dry");
         $io = new SymfonyStyle($input, $output);
         $io->title('Factory Method generator');
@@ -71,7 +79,8 @@ class FactoryMethod extends Command {
         return 0;
     }
 
-    private function write(SymfonyStyle $io, string $path, string $filename, string $content) {
+    private function write(SymfonyStyle $io, string $path, string $filename, string $content)
+    {
         $target = "$path/$filename.php";
         $io->section("Generation of $target");
         if (!$this->dryRun) {
@@ -80,7 +89,8 @@ class FactoryMethod extends Command {
         $io->success("$target created");
     }
 
-    private function generateModelInterface(string $source, string $className, string $modelInterface): string {
+    private function generateModelInterface(string $source, string $className, string $modelInterface): string
+    {
         try {
             $ast = $this->parser->parse($source);
             $traverser = new NodeTraverser();
@@ -93,7 +103,8 @@ class FactoryMethod extends Command {
         }
     }
 
-    private function updateModelClass(string $source, string $className, string $modelInterface, $modelConcrete): string {
+    private function updateModelClass(string $source, string $className, string $modelInterface, $modelConcrete): string
+    {
         try {
             $ast = $this->parser->parse($source);
             $traverser = new NodeTraverser();
@@ -106,7 +117,8 @@ class FactoryMethod extends Command {
         }
     }
 
-    private function generateFactoryInterface(string $source, string $className, string $factoryInterface, string $modelInterface): string {
+    private function generateFactoryInterface(string $source, string $className, string $factoryInterface, string $modelInterface): string
+    {
         try {
             $ast = $this->parser->parse($source);
             $traverser = new NodeTraverser();
@@ -119,7 +131,8 @@ class FactoryMethod extends Command {
         }
     }
 
-    private function generateConcreteFactory(string $source, string $className, $modelConcrete, $modelInterface, $factoryConcrete, $factoryInterface): string {
+    private function generateConcreteFactory(string $source, string $className, $modelConcrete, $modelInterface, $factoryConcrete, $factoryInterface): string
+    {
         try {
             $ast = $this->parser->parse($source);
             $traverser = new NodeTraverser();

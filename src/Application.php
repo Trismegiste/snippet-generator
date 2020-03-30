@@ -11,11 +11,17 @@ use Trismegiste\SnippetGenerator\Command\Helper\FilePicker;
 use Symfony\Component\Console\Application as BaseApplication;
 
 /**
- * Description of Application
+ * Application for this CLI
  */
-class Application extends BaseApplication {
+class Application extends BaseApplication
+{
 
-    protected function getDefaultHelperSet(): HelperSet {
+    /**
+     * Adding the FilePicker helper for all Commands
+     * @return HelperSet
+     */
+    protected function getDefaultHelperSet(): HelperSet
+    {
         $hs = parent::getDefaultHelperSet();
         $hs->set(new FilePicker());
 

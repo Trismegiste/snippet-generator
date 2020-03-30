@@ -16,20 +16,22 @@ use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\NodeVisitorAbstract;
 
 /**
- * Generate a new Interface wth the methods of a concrete class
+ * Generate a new Interface with the methods of a concrete class
  */
-class ClassToInterfaceGenerator extends NodeVisitorAbstract {
+class ClassToInterfaceGenerator extends NodeVisitorAbstract
+{
 
     protected $className;
     protected $interfaceName;
 
-    public function __construct(string $className, string $interfaceName) {
+    public function __construct(string $className, string $interfaceName)
+    {
         $this->className = $className;
         $this->interfaceName = $interfaceName;
     }
 
-    public function enterNode(Node $node) {
-
+    public function enterNode(Node $node)
+    {
         // filtering class in this namespace :
         if ($node instanceof Namespace_) {
             $node->stmts = array_filter($node->stmts, function($node) {
@@ -60,8 +62,8 @@ class ClassToInterfaceGenerator extends NodeVisitorAbstract {
 
             // creating the interface Node :
             $newInterface = new Interface_($this->interfaceName,
-                    ['stmts' => $node->stmts],
-                    ['comments' => $node->getComments()]);
+                ['stmts' => $node->stmts],
+                ['comments' => $node->getComments()]);
 
             return $newInterface;
         }

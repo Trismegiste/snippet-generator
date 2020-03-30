@@ -13,18 +13,26 @@ use PhpParser\NodeVisitor\NameResolver;
 /**
  * DecoratorGenerator transforms an interface into an implementation of a Decorator according to Design Pattern Decorator
  */
-class DecoratorGenerator extends NameResolver {
+class DecoratorGenerator extends NameResolver
+{
 
     protected $interfaceName;
     protected $decoratorName;
 
-    public function __construct(string $interfaceName, string $decoratorName) {
+    /**
+     * Ctor
+     * @param string $interfaceName The interface name implemented by the Decorator pattern
+     * @param string $decoratorName The Decorator class name
+     */
+    public function __construct(string $interfaceName, string $decoratorName)
+    {
         parent::__construct();
         $this->interfaceName = $interfaceName;
         $this->decoratorName = $decoratorName;
     }
 
-    public function enterNode(Node $node) {
+    public function enterNode(Node $node)
+    {
         parent::enterNode($node);
 
         // filtering interface in this namespace :
@@ -43,8 +51,8 @@ class DecoratorGenerator extends NameResolver {
         // transforms the interface into in a class :
         if ($node instanceof Interface_) {
             $decorator = new Node\Stmt\Class_($this->decoratorName,
-                    ['implements' => [$node->name], 'stmts' => $node->stmts],
-                    ['comments' => [new \PhpParser\Comment\Doc('/** This is a Decorator for ' . $node->namespacedName . ' */')]]);
+                ['implements' => [$node->name], 'stmts' => $node->stmts],
+                ['comments' => [new \PhpParser\Comment\Doc('/** This is a Decorator for ' . $node->namespacedName . ' */')]]);
 
             return $decorator;
         }
@@ -56,7 +64,8 @@ class DecoratorGenerator extends NameResolver {
         }
     }
 
-    public function leaveNode(Node $node) {
+    public function leaveNode(Node $node)
+    {
         parent::leaveNode($node);
 
         // finalizing the decorator :
@@ -74,32 +83,35 @@ class DecoratorGenerator extends NameResolver {
         }
     }
 
-    private function createDecoratedProperty(): Node\Stmt\Property {
+    private function createDecoratedProperty(): Node\Stmt\Property
+    {
         return new Node\Stmt\Property(Node\Stmt\Class_::MODIFIER_PROTECTED, [new Node\Stmt\PropertyProperty('decorated')]);
     }
 
-    private function createConstructor(Node $node): Node\Stmt\ClassMethod {
+    private function createConstructor(Node $node): Node\Stmt\ClassMethod
+    {
         $constructor = new Node\Stmt\ClassMethod('__construct', [
             'params' => [new Node\Param(new Node\Expr\Variable('decorated'), null, $node->implements[0]->name)],
             'flags' => Node\Stmt\Class_::MODIFIER_PUBLIC,
             'stmts' => [new Node\Stmt\Expression(new Node\Expr\Assign(
-                                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), 'decorated'),
-                                new Node\Expr\Variable('decorated')
-                        ))]
+                        new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), 'decorated'),
+                        new Node\Expr\Variable('decorated')
+                    ))]
         ]);
 
         return $constructor;
     }
 
-    private function implementsMethod(Node $node): void {
+    private function implementsMethod(Node $node): void
+    {
         $args = [];
         foreach ($node->params as $param) {
             $args[] = new Node\Expr\Variable($param->var->name);
         }
 
         $methodCall = new Node\Expr\MethodCall(
-                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), 'decorated'),
-                $node->name, $args);
+            new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), 'decorated'),
+            $node->name, $args);
 
         if ($node->returnType == 'void') {
             $node->stmts[0] = new Node\Stmt\Expression($methodCall);

@@ -18,19 +18,28 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * Generates the FactoryMethod Interface
  */
-class FactoryMethodGenerator extends NodeVisitorAbstract {
+class FactoryMethodGenerator extends NodeVisitorAbstract
+{
 
     protected $className;
     protected $factoryName;
     protected $objectInterface;
 
-    public function __construct(string $className, string $factoryName, string $objectInterface) {
+    /**
+     * Ctor
+     * @param string $className The original class name to refactor
+     * @param string $factoryName The interface name of the factory
+     * @param string $objectInterface The interface name of the Model
+     */
+    public function __construct(string $className, string $factoryName, string $objectInterface)
+    {
         $this->className = $className;
         $this->factoryName = $factoryName;
         $this->objectInterface = $objectInterface;
     }
 
-    public function enterNode(Node $node) {
+    public function enterNode(Node $node)
+    {
         // filtering class in this namespace :
         if ($node instanceof Namespace_) {
             $node->stmts = array_filter($node->stmts, function($node) {
