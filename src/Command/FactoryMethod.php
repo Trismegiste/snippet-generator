@@ -38,7 +38,8 @@ class FactoryMethod extends Command {
                 ->setDescription('Generate a Factory Method for a concrete Class')
                 ->addArgument('class', InputArgument::REQUIRED, "name of the Class file (without '.php'')")
                 ->addArgument('source', InputArgument::OPTIONAL, 'The directory of your source', './src')
-                ->addOption('dry', null, \Symfony\Component\Console\Input\InputOption::VALUE_NONE, "No writing, only test");
+                ->addOption('dry', null, \Symfony\Component\Console\Input\InputOption::VALUE_NONE, "No writing, only test")
+                ->setHelp(file_get_contents(__DIR__ . '/../../doc/FactoryMethod.md'));
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output) {
