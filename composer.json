@@ -26,7 +26,7 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "./tests",
-            "Fixtures\\Demo\\": "./tests"
+            "Fixtures\\Demo\\": "./tests/fixtures"
         }
     }
 }
