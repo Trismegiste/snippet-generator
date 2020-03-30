@@ -57,10 +57,10 @@ class FactoryMethod extends Command {
 
         $source = $classFile->getContents();
         // generation
-        echo $this->generateModelInterface($source, $className, $interfaceNew);
-        echo $this->updateModelClass($source, $className, $interfaceNew, $concreteNew);
-        echo $this->generateFactoryInterface($source, $className, $factoryMethod, $interfaceNew);
-        echo $this->generateConcreteFactory($source, $className, $concreteNew, $interfaceNew, $factoryMethod, $concreteFactory);
+        file_put_contents($classFile->getPath() . '/' . $interfaceNew . '.php', $this->generateModelInterface($source, $className, $interfaceNew));
+        file_put_contents($classFile->getPath() . '/' . $concreteNew . '.php', $this->updateModelClass($source, $className, $interfaceNew, $concreteNew));
+        file_put_contents($classFile->getPath() . '/' . $factoryMethod . '.php', $this->generateFactoryInterface($source, $className, $factoryMethod, $interfaceNew));
+        file_put_contents($classFile->getPath() . '/' . $concreteFactory . '.php', $this->generateConcreteFactory($source, $className, $concreteNew, $interfaceNew, $factoryMethod, $concreteFactory));
 
         return 0;
     }
