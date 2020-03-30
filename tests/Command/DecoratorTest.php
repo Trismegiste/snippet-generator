@@ -24,4 +24,19 @@ class DecoratorTest extends TestCase {
         unlink($created);
     }
 
+    public function testFailure() {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $command = new Decorator();
+        $application->add($command);
+        $tester = new CommandTester($application->find('pattern:decorator'));
+
+        $this->expectException(Symfony\Component\Console\Exception\RuntimeException::class);
+        $this->expectExceptionMessage("Unable");
+        $this->assertEquals(0, $tester->execute([
+                    'source' => __DIR__ . '/../fixtures',
+                    'interface' => 'Invalid'
+        ]));
+    }
+
 }

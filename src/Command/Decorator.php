@@ -42,14 +42,13 @@ class Decorator extends Command {
         $parser = (new ParserFactory)->create(ParserFactory::ONLY_PHP7);
         try {
             $ast = $parser->parse($interfaceFile->getContents());
-        } catch (Error $error) {
-            throw new RuntimeException("Unable to parse $interfaceFile", $error->getCode(), $error->getMessage());
+            $decoratorName = $interfaceName . 'Decorator';
+            $traverser = new NodeTraverser();
+            $traverser->addVisitor(new DecoratorGenerator($interfaceName, $decoratorName));
+            $ast = $traverser->traverse($ast);
+        } catch (\Exception $error) {
+            throw new RuntimeException("Unable to parse $interfaceFile", $error->getCode(), $error);
         }
-
-        $decoratorName = $interfaceName . 'Decorator';
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new DecoratorGenerator($interfaceName, $decoratorName));
-        $ast = $traverser->traverse($ast);
 
         $prettyPrinter = new Standard;
         $io->section("Generation of $decoratorName.php");
