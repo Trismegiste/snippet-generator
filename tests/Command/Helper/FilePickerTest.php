@@ -9,39 +9,49 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\SplFileInfo;
 use Trismegiste\SnippetGenerator\Command\Helper\FilePicker;
 
-class FilePickerTest extends TestCase {
+class FilePickerTest extends TestCase
+{
 
     protected $sut;
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         $this->sut = new FilePicker();
     }
 
-    protected function tearDown(): void {
+    protected function tearDown(): void
+    {
         unset($this->sut);
     }
 
-    public function testNoFile() {
+    public function testNoFile()
+    {
         $this->expectException(RuntimeException::class);
         $this->sut->pickFile($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class), __DIR__, 'X');
     }
 
-    public function testOneFile() {
-        $found = $this->sut->pickFile($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class), __DIR__, 'FilePicker*');
+    public function testOneFile()
+    {
+        $found = $this->sut->pickFile($this->createStub(InputInterface::class),
+            $this->createStub(OutputInterface::class), __DIR__,
+            'FilePicker*');
         $this->assertInstanceOf(SplFileInfo::class, $found);
         $this->assertStringEndsWith('FilePickerTest.php', (string) $found);
     }
 
-    public function testManyFile() {
+    public function testManyFile()
+    {
         $questionHelper = $this->createMock(QuestionHelper::class);
         $questionHelper->expects($this->once())
-                ->method('ask')
-                ->willReturnCallback(function($i, $o, $question) {
-                    return $question->getChoices()[0];   // we take the first choice in the list returned by the Finder
-                });
+            ->method('ask')
+            ->willReturnCallback(function($i, $o, $question) {
+                return $question->getChoices()[0];   // we take the first choice in the list returned by the Finder
+            });
         $this->sut->setHelperSet(new HelperSet(['question' => $questionHelper]));
 
-        $found = $this->sut->pickFile($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class), __DIR__ . '/../..', '*Test.php');
+        $found = $this->sut->pickFile($this->createStub(InputInterface::class),
+            $this->createStub(OutputInterface::class), __DIR__ . '/../..', '*Test.php'
+        );
 
         $this->assertInstanceOf(SplFileInfo::class, $found);
         $this->assertStringEndsWith('Test.php', (string) $found);
