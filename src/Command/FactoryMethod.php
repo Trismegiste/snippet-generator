@@ -55,17 +55,17 @@ class FactoryMethod extends Command {
         /* @var $classFile SplFileInfo */
         $classFile = $this->getHelper('file-picker')->pickFile($input, $output, $input->getArgument('source'), $className . '.php');
 
-        $interfaceNew = $io->ask(self::nameMsg . "new Interface abstracting $className class ", $className);
-        $concreteNew = $io->ask(self::nameMsg . "existing concrete class abstracted by $interfaceNew interface ", 'Concrete' . $className);
-        $factoryMethod = $io->ask(self::nameMsg . "new Factory Method interface ", $interfaceNew . 'Factory');
-        $concreteFactory = $io->ask(self::nameMsg . "concrete factory implementing $factoryMethod and that creates $concreteNew objects ", $concreteNew . 'Factory');
+        $modelInterface = $io->ask(self::nameMsg . "new Interface abstracting $className class ", $className);
+        $modelConcrete = $io->ask(self::nameMsg . "existing concrete class abstracted by $modelInterface interface ", 'Concrete' . $className);
+        $factoryInterface = $io->ask(self::nameMsg . "new Factory Method interface ", $modelInterface . 'Factory');
+        $factoryConcrete = $io->ask(self::nameMsg . "concrete factory implementing $factoryInterface and that creates $modelConcrete objects ", $modelConcrete . 'Factory');
 
         $source = $classFile->getContents();
         // generation
-        $this->write($io, $classFile->getPath(), $interfaceNew, $this->generateModelInterface($source, $className, $interfaceNew));
-        $this->write($io, $classFile->getPath(), $concreteNew, $this->updateModelClass($source, $className, $interfaceNew, $concreteNew));
-        $this->write($io, $classFile->getPath(), $factoryMethod, $this->generateFactoryInterface($source, $className, $factoryMethod, $interfaceNew));
-        $this->write($io, $classFile->getPath(), $concreteFactory, $this->generateConcreteFactory($source, $className, $concreteNew, $interfaceNew, $factoryMethod, $concreteFactory));
+        $this->write($io, $classFile->getPath(), $modelInterface, $this->generateModelInterface($source, $className, $modelInterface));
+        $this->write($io, $classFile->getPath(), $modelConcrete, $this->updateModelClass($source, $className, $modelInterface, $modelConcrete));
+        $this->write($io, $classFile->getPath(), $factoryInterface, $this->generateFactoryInterface($source, $className, $factoryInterface, $modelInterface));
+        $this->write($io, $classFile->getPath(), $factoryConcrete, $this->generateConcreteFactory($source, $className, $modelConcrete, $modelInterface, $factoryInterface, $factoryConcrete));
 
         return 0;
     }
@@ -79,53 +79,53 @@ class FactoryMethod extends Command {
         $io->success("$target created");
     }
 
-    private function generateModelInterface(string $source, string $className, string $interfaceName): string {
+    private function generateModelInterface(string $source, string $className, string $modelInterface): string {
         try {
             $ast = $this->parser->parse($source);
             $traverser = new NodeTraverser();
-            $traverser->addVisitor(new ClassToInterfaceGenerator($className, $interfaceName));
+            $traverser->addVisitor(new ClassToInterfaceGenerator($className, $modelInterface));
             $ast = $traverser->traverse($ast);
         } catch (Error $error) {
-            throw new RuntimeException("Unable to generate $interfaceName", $error->getCode(), $error->getMessage());
+            throw new RuntimeException("Unable to generate $modelInterface", $error->getCode(), $error->getMessage());
         }
 
         return $this->prettyPrinter->prettyPrintFile($ast);
     }
 
-    private function updateModelClass(string $source, string $className, string $interfaceName, $newClassName): string {
+    private function updateModelClass(string $source, string $className, string $modelInterface, $modelConcrete): string {
         try {
             $ast = $this->parser->parse($source);
             $traverser = new NodeTraverser();
-            $traverser->addVisitor(new ClassInheritsFromPublicInterface($className, $interfaceName, $newClassName));
+            $traverser->addVisitor(new ClassInheritsFromPublicInterface($className, $modelInterface, $modelConcrete));
             $ast = $traverser->traverse($ast);
         } catch (Error $error) {
-            throw new RuntimeException("Unable to update $className into $newClassName", $error->getCode(), $error->getMessage());
+            throw new RuntimeException("Unable to update $className into $modelConcrete", $error->getCode(), $error->getMessage());
         }
 
         return $this->prettyPrinter->prettyPrintFile($ast);
     }
 
-    private function generateFactoryInterface(string $source, string $className, string $factoryName, string $interfaceName): string {
+    private function generateFactoryInterface(string $source, string $className, string $factoryInterface, string $modelInterface): string {
         try {
             $ast = $this->parser->parse($source);
             $traverser = new NodeTraverser();
-            $traverser->addVisitor(new FactoryMethodGenerator($className, $factoryName, $interfaceName));
+            $traverser->addVisitor(new FactoryMethodGenerator($className, $factoryInterface, $modelInterface));
             $ast = $traverser->traverse($ast);
         } catch (Error $error) {
-            throw new RuntimeException("Unable to generate $factoryName", $error->getCode(), $error->getMessage());
+            throw new RuntimeException("Unable to generate $factoryInterface", $error->getCode(), $error->getMessage());
         }
 
         return $this->prettyPrinter->prettyPrintFile($ast);
     }
 
-    private function generateConcreteFactory(string $source, string $className, string $model, string $interfaceName, string $factoryName, string $concreteFactory): string {
+    private function generateConcreteFactory(string $source, string $className, $modelConcrete, $modelInterface, $factoryInterface, $factoryConcrete): string {
         try {
             $ast = $this->parser->parse($source);
             $traverser = new NodeTraverser();
-            $traverser->addVisitor(new ConcreteFactoryGenerator($className, $model, $interfaceName, $concreteFactory, $factoryName));
+            $traverser->addVisitor(new ConcreteFactoryGenerator($className, $modelConcrete, $modelInterface, $factoryConcrete, $factoryInterface));
             $ast = $traverser->traverse($ast);
         } catch (Error $error) {
-            throw new RuntimeException("Unable to generate $concreteFactory", $error->getCode(), $error->getMessage());
+            throw new RuntimeException("Unable to generate $factoryConcrete", $error->getCode(), $error->getMessage());
         }
 
         return $this->prettyPrinter->prettyPrintFile($ast);
