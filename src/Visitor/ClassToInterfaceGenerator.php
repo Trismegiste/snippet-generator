@@ -37,7 +37,7 @@ class ClassToInterfaceGenerator extends NodeVisitorAbstract {
             });
 
             if (0 === count($node->stmts)) {
-                throw new LogicException("{$this->className} class not found");
+                throw new LogicException("'{$this->className}' class not found");
             }
 
             return $node;

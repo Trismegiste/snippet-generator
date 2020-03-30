@@ -89,7 +89,7 @@ class FactoryMethod extends Command {
 
             return $this->prettyPrinter->prettyPrintFile($ast);
         } catch (\Exception $error) {
-            throw new RuntimeException("Unable to generate $modelInterface", $error->getCode(), $error->getMessage());
+            throw new RuntimeException("Unable to generate $modelInterface.php", $error->getCode(), $error);
         }
     }
 
@@ -102,7 +102,7 @@ class FactoryMethod extends Command {
 
             return $this->prettyPrinter->prettyPrintFile($ast);
         } catch (\Exception $error) {
-            throw new RuntimeException("Unable to update $className into $modelConcrete", $error->getCode(), $error->getMessage());
+            throw new RuntimeException("Unable to update $className into $modelConcrete.php", $error->getCode(), $error);
         }
     }
 
@@ -115,7 +115,7 @@ class FactoryMethod extends Command {
 
             return $this->prettyPrinter->prettyPrintFile($ast);
         } catch (\Exception $error) {
-            throw new RuntimeException("Unable to generate $factoryInterface", $error->getCode(), $error->getMessage());
+            throw new RuntimeException("Unable to generate $factoryInterface.php", $error->getCode(), $error);
         }
     }
 
@@ -128,7 +128,7 @@ class FactoryMethod extends Command {
 
             return $this->prettyPrinter->prettyPrintFile($ast);
         } catch (\Exception $error) {
-            throw new RuntimeException("Unable to generate $factoryConcrete", $error->getCode(), $error->getMessage());
+            throw new RuntimeException("Unable to generate $factoryConcrete.php", $error->getCode(), $error);
         }
     }
 

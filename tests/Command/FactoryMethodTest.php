@@ -46,4 +46,21 @@ class FactoryMethodTest extends TestCase {
         }
     }
 
+    public function testFailure() {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $command = new FactoryMethod();
+        $application->add($command);
+        $tester = new CommandTester($application->find('pattern:factory-method'));
+        $tester->setInputs(['A', 'B', 'C', 'D']);
+
+        $this->expectException(Symfony\Component\Console\Exception\RuntimeException::class);
+        $this->expectExceptionMessage("Unable");
+        $this->assertEquals(0, $tester->execute([
+                    'source' => __DIR__ . '/../fixtures',
+                    'class' => 'Invalid',
+                    '--dry' => true
+        ]));
+    }
+
 }
