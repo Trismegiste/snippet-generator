@@ -33,12 +33,16 @@ class FactoryMethodTest extends TestCase {
         ];
         foreach ($created as $fch) {
             $this->assertFileExists($fch);
-            //    unlink($fch);
         }
+        // instantiate
         $fac = new \Fixtures\Demo\ConcreteFactory();
         $obj = $fac->create('login', 'pwd');
         $this->assertInstanceOf(\Fixtures\Demo\UserInterface::class, $obj);
         $this->assertInstanceOf(\Fixtures\Demo\ConcreteUser::class, $obj);
+        // clean
+        foreach ($created as $fch) {
+            unlink($fch);
+        }
     }
 
 }
