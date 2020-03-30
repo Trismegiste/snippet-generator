@@ -52,7 +52,9 @@ class Decorator extends Command {
         $ast = $traverser->traverse($ast);
 
         $prettyPrinter = new Standard;
+        $io->section("Generation of $decoratorName.php");
         file_put_contents($interfaceFile->getPath() . '/' . $decoratorName . '.php', $prettyPrinter->prettyPrintFile($ast));
+        $io->success("$decoratorName.php created");
 
         return 0;
     }

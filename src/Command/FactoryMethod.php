@@ -27,14 +27,18 @@ use Trismegiste\SnippetGenerator\Visitor\FactoryMethodGenerator;
  */
 class FactoryMethod extends Command {
 
+    protected const nameMsg = "Please choose a name for the ";
+
     protected $parser;
     protected $printer;
+    protected $dryRun = false;
 
     protected function configure() {
         $this->setName('pattern:factory-method')
                 ->setDescription('Generate a Factory Method for a concrete Class')
                 ->addArgument('class', InputArgument::REQUIRED, "name of the Class file (without '.php'')")
-                ->addArgument('source', InputArgument::OPTIONAL, 'The directory of your source', './src');
+                ->addArgument('source', InputArgument::OPTIONAL, 'The directory of your source', './src')
+                ->addOption('dry', null, \Symfony\Component\Console\Input\InputOption::VALUE_NONE, "No writing, only test");
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output) {
@@ -43,6 +47,7 @@ class FactoryMethod extends Command {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int {
+        $this->dryRun = $input->getOption("dry");
         $io = new SymfonyStyle($input, $output);
         $io->title('Factory Method generator');
         $className = $input->getArgument('class');
@@ -50,19 +55,28 @@ class FactoryMethod extends Command {
         /* @var $classFile SplFileInfo */
         $classFile = $this->getHelper('file-picker')->pickFile($input, $output, $input->getArgument('source'), $className . '.php');
 
-        $interfaceNew = $io->ask("Please choose a name for the new Interface abstracting $className class ", $className);
-        $concreteNew = $io->ask("Please choose a new name for the existing concrete class abstracted by $interfaceNew interface ", 'Concrete' . $className);
-        $factoryMethod = $io->ask("Please choose a name for the new Factory Method interface ", $interfaceNew . 'Factory');
-        $concreteFactory = $io->ask("Please choose a name for the concrete factory implementing $factoryMethod and that creates $concreteNew objects ", $concreteNew . 'Factory');
+        $interfaceNew = $io->ask(self::nameMsg . "new Interface abstracting $className class ", $className);
+        $concreteNew = $io->ask(self::nameMsg . "existing concrete class abstracted by $interfaceNew interface ", 'Concrete' . $className);
+        $factoryMethod = $io->ask(self::nameMsg . "new Factory Method interface ", $interfaceNew . 'Factory');
+        $concreteFactory = $io->ask(self::nameMsg . "concrete factory implementing $factoryMethod and that creates $concreteNew objects ", $concreteNew . 'Factory');
 
         $source = $classFile->getContents();
         // generation
-        file_put_contents($classFile->getPath() . '/' . $interfaceNew . '.php', $this->generateModelInterface($source, $className, $interfaceNew));
-        file_put_contents($classFile->getPath() . '/' . $concreteNew . '.php', $this->updateModelClass($source, $className, $interfaceNew, $concreteNew));
-        file_put_contents($classFile->getPath() . '/' . $factoryMethod . '.php', $this->generateFactoryInterface($source, $className, $factoryMethod, $interfaceNew));
-        file_put_contents($classFile->getPath() . '/' . $concreteFactory . '.php', $this->generateConcreteFactory($source, $className, $concreteNew, $interfaceNew, $factoryMethod, $concreteFactory));
+        $this->write($io, $classFile->getPath(), $interfaceNew, $this->generateModelInterface($source, $className, $interfaceNew));
+        $this->write($io, $classFile->getPath(), $concreteNew, $this->updateModelClass($source, $className, $interfaceNew, $concreteNew));
+        $this->write($io, $classFile->getPath(), $factoryMethod, $this->generateFactoryInterface($source, $className, $factoryMethod, $interfaceNew));
+        $this->write($io, $classFile->getPath(), $concreteFactory, $this->generateConcreteFactory($source, $className, $concreteNew, $interfaceNew, $factoryMethod, $concreteFactory));
 
         return 0;
+    }
+
+    private function write(SymfonyStyle $io, string $path, string $filename, string $content) {
+        $target = "$path/$filename.php";
+        $io->section("Generation of $target");
+        if (!$this->dryRun) {
+            file_put_contents($target, $content);
+        }
+        $io->success("$target created");
     }
 
     private function generateModelInterface(string $source, string $className, string $interfaceName): string {
