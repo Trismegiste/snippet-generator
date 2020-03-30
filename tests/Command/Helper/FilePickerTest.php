@@ -36,15 +36,15 @@ class FilePickerTest extends TestCase {
         $questionHelper = $this->createMock(QuestionHelper::class);
         $questionHelper->expects($this->once())
                 ->method('ask')
-                ->willReturnCallback(function(...$param) {
-                    return $param[2]->getChoices()[0];   // [2] because the Question is #2 parameter and we take the first choice in the list returned by the Finder
+                ->willReturnCallback(function($i, $o, $question) {
+                    return $question->getChoices()[0];   // we take the first choice in the list returned by the Finder
                 });
         $this->sut->setHelperSet(new HelperSet(['question' => $questionHelper]));
 
-        $found = $this->sut->pickFile($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class), __DIR__ . '/..', '*.php');
+        $found = $this->sut->pickFile($this->createStub(InputInterface::class), $this->createStub(OutputInterface::class), __DIR__ . '/../..', '*Test.php');
 
         $this->assertInstanceOf(SplFileInfo::class, $found);
-        $this->assertStringEndsWith('FilePickerTest.php', (string) $found);
+        $this->assertStringEndsWith('Test.php', (string) $found);
     }
 
 }
