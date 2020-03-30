@@ -24,12 +24,14 @@ class ConcreteFactoryGenerator extends NodeVisitorAbstract {
     protected $factoryName;
     protected $objectInterface;
     protected $factoryInterfaceName;
+    protected $model;
 
-    public function __construct(string $className, string $objectInterface, string $factoryName, string $factoryInterfaceName) {
+    public function __construct(string $className, string $model, string $objectInterface, string $factoryName, string $factoryInterfaceName) {
         $this->className = $className;
         $this->factoryName = $factoryName;
         $this->objectInterface = $objectInterface;
         $this->factoryInterfaceName = $factoryInterfaceName;
+        $this->model = $model;
     }
 
     public function enterNode(Node $node) {
@@ -76,7 +78,7 @@ class ConcreteFactoryGenerator extends NodeVisitorAbstract {
                 $args[] = new Node\Expr\Variable($param->var->name);
             }
 
-            $node->stmts = [new Node\Stmt\Return_(new Node\Expr\New_(new Node\Name($this->className), $args))];
+            $node->stmts = [new Node\Stmt\Return_(new Node\Expr\New_(new Node\Name($this->model), $args))];
         }
     }
 

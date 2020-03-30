@@ -60,7 +60,7 @@ class FactoryMethod extends Command {
         echo $this->generateModelInterface($source, $className, $interfaceNew);
         echo $this->updateModelClass($source, $className, $interfaceNew, $concreteNew);
         echo $this->generateFactoryInterface($source, $className, $factoryMethod, $interfaceNew);
-        echo $this->generateConcreteFactory($source, $className, $interfaceNew, $factoryMethod, $concreteFactory);
+        echo $this->generateConcreteFactory($source, $className, $concreteNew, $interfaceNew, $factoryMethod, $concreteFactory);
 
         return 0;
     }
@@ -98,20 +98,20 @@ class FactoryMethod extends Command {
             $traverser->addVisitor(new FactoryMethodGenerator($className, $factoryName, $interfaceName));
             $ast = $traverser->traverse($ast);
         } catch (Error $error) {
-            throw new RuntimeException("Unable to update $className into $newClassName", $error->getCode(), $error->getMessage());
+            throw new RuntimeException("Unable to generate $factoryName", $error->getCode(), $error->getMessage());
         }
 
         return $this->prettyPrinter->prettyPrintFile($ast);
     }
 
-    private function generateConcreteFactory(string $source, string $className, string $interfaceName, string $factoryName, string $concreteFactory): string {
+    private function generateConcreteFactory(string $source, string $className, string $model, string $interfaceName, string $factoryName, string $concreteFactory): string {
         try {
             $ast = $this->parser->parse($source);
             $traverser = new NodeTraverser();
-            $traverser->addVisitor(new ConcreteFactoryGenerator($className, $interfaceName, $concreteFactory, $factoryName));
+            $traverser->addVisitor(new ConcreteFactoryGenerator($className, $model, $interfaceName, $concreteFactory, $factoryName));
             $ast = $traverser->traverse($ast);
         } catch (Error $error) {
-            throw new RuntimeException("Unable to update $className into $newClassName", $error->getCode(), $error->getMessage());
+            throw new RuntimeException("Unable to generate $concreteFactory", $error->getCode(), $error->getMessage());
         }
 
         return $this->prettyPrinter->prettyPrintFile($ast);

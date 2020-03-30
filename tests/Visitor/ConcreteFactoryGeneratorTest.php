@@ -9,7 +9,7 @@ class ConcreteFactoryGeneratorTest extends VisitorTestCase {
 
     protected function generate(string $name, string $example) {
         $ast = $this->parser->parse('<?php ' . $example);
-        $this->traverser->addVisitor(new ConcreteFactoryGenerator($name, $name . 'Interface', 'ConcreteFactory', 'Factory'));
+        $this->traverser->addVisitor(new ConcreteFactoryGenerator($name, 'Concrete' . $name, $name . 'Interface', 'ConcreteFactory', 'Factory'));
         return $this->traverser->traverse($ast);
     }
 
