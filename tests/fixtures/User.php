@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Security;
+namespace Fixtures\Demo;
 
-use Trismegiste\Toolbox\MongoDb\RootImpl;
+use Fixtures\Demo\DemoTrait;
 
 /**
  * Some conrete class to abstract
  */
 class User {
 
-    use RootImpl;
+    use DemoTrait;
 
     const AUTH = 42;
 
