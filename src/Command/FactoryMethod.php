@@ -6,7 +6,6 @@
 
 namespace Trismegiste\SnippetGenerator\Command;
 
-use PhpParser\Error;
 use PhpParser\NodeTraverser;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
@@ -14,6 +13,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Finder\SplFileInfo;
@@ -38,7 +38,7 @@ class FactoryMethod extends Command {
                 ->setDescription('Generate a Factory Method for a concrete Class')
                 ->addArgument('class', InputArgument::REQUIRED, "name of the Class file (without '.php'')")
                 ->addArgument('source', InputArgument::OPTIONAL, 'The directory of your source', './src')
-                ->addOption('dry', null, \Symfony\Component\Console\Input\InputOption::VALUE_NONE, "No writing, only test")
+                ->addOption('dry', null, InputOption::VALUE_NONE, "No writing, only test")
                 ->setHelp(file_get_contents(__DIR__ . '/../../doc/FactoryMethod.md'));
     }
 
@@ -86,11 +86,11 @@ class FactoryMethod extends Command {
             $traverser = new NodeTraverser();
             $traverser->addVisitor(new ClassToInterfaceGenerator($className, $modelInterface));
             $ast = $traverser->traverse($ast);
-        } catch (Error $error) {
+
+            return $this->prettyPrinter->prettyPrintFile($ast);
+        } catch (\Exception $error) {
             throw new RuntimeException("Unable to generate $modelInterface", $error->getCode(), $error->getMessage());
         }
-
-        return $this->prettyPrinter->prettyPrintFile($ast);
     }
 
     private function updateModelClass(string $source, string $className, string $modelInterface, $modelConcrete): string {
@@ -99,11 +99,11 @@ class FactoryMethod extends Command {
             $traverser = new NodeTraverser();
             $traverser->addVisitor(new ClassInheritsFromPublicInterface($className, $modelInterface, $modelConcrete));
             $ast = $traverser->traverse($ast);
-        } catch (Error $error) {
+
+            return $this->prettyPrinter->prettyPrintFile($ast);
+        } catch (\Exception $error) {
             throw new RuntimeException("Unable to update $className into $modelConcrete", $error->getCode(), $error->getMessage());
         }
-
-        return $this->prettyPrinter->prettyPrintFile($ast);
     }
 
     private function generateFactoryInterface(string $source, string $className, string $factoryInterface, string $modelInterface): string {
@@ -112,11 +112,11 @@ class FactoryMethod extends Command {
             $traverser = new NodeTraverser();
             $traverser->addVisitor(new FactoryMethodGenerator($className, $factoryInterface, $modelInterface));
             $ast = $traverser->traverse($ast);
-        } catch (Error $error) {
+
+            return $this->prettyPrinter->prettyPrintFile($ast);
+        } catch (\Exception $error) {
             throw new RuntimeException("Unable to generate $factoryInterface", $error->getCode(), $error->getMessage());
         }
-
-        return $this->prettyPrinter->prettyPrintFile($ast);
     }
 
     private function generateConcreteFactory(string $source, string $className, $modelConcrete, $modelInterface, $factoryInterface, $factoryConcrete): string {
@@ -125,11 +125,11 @@ class FactoryMethod extends Command {
             $traverser = new NodeTraverser();
             $traverser->addVisitor(new ConcreteFactoryGenerator($className, $modelConcrete, $modelInterface, $factoryConcrete, $factoryInterface));
             $ast = $traverser->traverse($ast);
-        } catch (Error $error) {
+
+            return $this->prettyPrinter->prettyPrintFile($ast);
+        } catch (\Exception $error) {
             throw new RuntimeException("Unable to generate $factoryConcrete", $error->getCode(), $error->getMessage());
         }
-
-        return $this->prettyPrinter->prettyPrintFile($ast);
     }
 
 }
