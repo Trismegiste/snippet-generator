@@ -1,14 +1,15 @@
 <?php
 
-use PhpParser\Node\Stmt\Interface_;
+use PhpParser\Node\Stmt\Class_;
+use PhpParser\Node\Stmt\ClassMethod;
 use Tests\Visitor\VisitorTestCase;
-use Trismegiste\SnippetGenerator\Visitor\FactoryMethodGenerator;
+use Trismegiste\SnippetGenerator\Visitor\ConcreteFactoryGenerator;
 
-class FactoryMethodGeneratorTest extends VisitorTestCase {
+class ConcreteFactoryGeneratorTest extends VisitorTestCase {
 
     protected function generate(string $name, string $example) {
         $ast = $this->parser->parse('<?php ' . $example);
-        $this->traverser->addVisitor(new FactoryMethodGenerator($name, 'Factory', $name . 'Interface'));
+        $this->traverser->addVisitor(new ConcreteFactoryGenerator($name, $name . 'Interface', 'ConcreteFactory', 'Factory'));
         return $this->traverser->traverse($ast);
     }
 
@@ -17,14 +18,14 @@ class FactoryMethodGeneratorTest extends VisitorTestCase {
         $this->assertCount(1, $ast);
         $ns = array_pop($ast);
         $this->assertCount(1, $ns->stmts);
-        $interfaceNode = array_pop($ns->stmts);
-        $this->assertInstanceOf(Interface_::class, $interfaceNode);
-        $this->assertEquals('Factory', (string) $interfaceNode->name);
-        $this->assertCount(1, $interfaceNode->stmts); // one creation method
-        $methodNode = array_pop($interfaceNode->stmts);
-        $this->assertInstanceOf(PhpParser\Node\Stmt\ClassMethod::class, $methodNode);
+        $classNode = array_pop($ns->stmts);
+        $this->assertInstanceOf(Class_::class, $classNode);
+        $this->assertEquals('ConcreteFactory', (string) $classNode->name);
+        $this->assertCount(1, $classNode->stmts); // one creation method
+        $methodNode = array_pop($classNode->stmts);
+        $this->assertInstanceOf(ClassMethod::class, $methodNode);
         $this->assertEquals('create', (string) $methodNode->name);
-        $this->assertNull($methodNode->stmts);
+        $this->assertNotNull($methodNode->stmts);
         $this->assertCount(0, $methodNode->params);
     }
 
@@ -33,12 +34,12 @@ class FactoryMethodGeneratorTest extends VisitorTestCase {
         $ast = $this->generate('User', substr($content, 5));
         $this->assertStringNotContainsString('42', $this->toPhp($ast));
         $this->assertCount(1, $ast[0]->stmts);
-        $inter = array_pop($ast[0]->stmts);
-        $this->assertCount(1, $inter->stmts); // 1 method
-        $methodNode = array_pop($inter->stmts);
-        $this->assertInstanceOf(PhpParser\Node\Stmt\ClassMethod::class, $methodNode);
+        $factory = array_pop($ast[0]->stmts);
+        $this->assertCount(1, $factory->stmts); // 1 method
+        $methodNode = array_pop($factory->stmts);
+        $this->assertInstanceOf(ClassMethod::class, $methodNode);
         $this->assertEquals('create', (string) $methodNode->name);
-        $this->assertNull($methodNode->stmts);
+        $this->assertNotNull($methodNode->stmts);
         $this->assertCount(2, $methodNode->params);
     }
 
