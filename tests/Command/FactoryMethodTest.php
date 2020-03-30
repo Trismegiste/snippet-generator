@@ -34,8 +34,9 @@ class FactoryMethodTest extends TestCase {
         foreach ($created as $fch) {
             $this->assertFileExists($fch);
         }
-        // instantiate
+        // instantiate since autoload-dev is configured for those classes :
         $fac = new \Fixtures\Demo\ConcreteFactory();
+        $this->assertInstanceOf(\Fixtures\Demo\FactoryMethod::class, $fac);
         $obj = $fac->create('login', 'pwd');
         $this->assertInstanceOf(\Fixtures\Demo\UserInterface::class, $obj);
         $this->assertInstanceOf(\Fixtures\Demo\ConcreteUser::class, $obj);

@@ -19,6 +19,8 @@ use Symfony\Component\Finder\SplFileInfo;
  */
 class FilePicker extends Helper {
 
+    protected const question = "There are multiple files matching '%s', please select the one you refer to ";
+
     public function getName(): string {
         return 'file-picker';
     }
@@ -38,8 +40,7 @@ class FilePicker extends Helper {
                 $pickedOne = array_pop($found);
                 break;
             default :
-                $question = new ChoiceQuestion("There are multiple files with the pattern '$pattern', please select the one you refer to ",
-                        array_keys($found));
+                $question = new ChoiceQuestion(sprintf(self::question, $pattern), array_keys($found));
                 $choice = $questionHelper->ask($input, $output, $question);
                 $pickedOne = $found[$choice];
         }
